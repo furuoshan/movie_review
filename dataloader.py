@@ -1,45 +1,27 @@
-from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
-from torchvision.transforms import InterpolationMode
 import torch
-import numpy as np
-import matplotlib.pyplot as plt
+from datasets import load_dataset
 
+def load_checkpoint(model, optimizer, device, filepath="./checkpoint.pth"):
+    checkpoint = torch.load(filepath, map_location=device, weights_only=True)
+    model.load_state_dict(checkpoint["model"])
+    model.vocab = checkpoint["vocab"]
+    optimizer.load_state_dict(checkpoint["optimizer"])
+    epoch = checkpoint["epoch"]
+    return epoch
 
-def load_transformer_dataset(image_size=32,batch_size=128) -> DataLoader:
-    transform_train = transforms.Compose([transforms.RandomRotation(degrees=15),
-                                          transforms.Resize((image_size,image_size),
-                                          interpolation=InterpolationMode.BILINEAR), transforms.ToTensor()])
-    transform_test = transforms.Compose([transforms.Resize((image_size, image_size),
-                                         interpolation=InterpolationMode.BILINEAR),
-                                         transforms.ToTensor()])
+def load_transformer_dataset(batch_size) -> DataLoader:
+    train_dataset = load_dataset(".\\data", split="train")
+    test_dataset = load_dataset(".\\data", split="test")
+    # unsupervised_dataset = load_dataset(".\\data", split="unsupervised")
 
-    train_dataset = datasets.MNIST(
-        root='./data',  # 数据存储路径
-        train=True,  # 加载训练集
-        download=False,  # 如果数据不存在则自动下载
-        transform=transform_train,
-    )
-    test_dataset = datasets.MNIST(
-        root='./data',  # 数据存储路径
-        train=False,  # 加载测试集
-        download=False,  # 如果数据不存在则自动下载
-        transform=transform_test,
-    )
-    return DataLoader(train_dataset, batch_size=batch_size, drop_last=True), DataLoader(test_dataset, batch_size=batch_size, drop_last=False)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, drop_last=False)
+    # unsupervised_loader = DataLoader(unsupervised_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    return train_loader, test_loader, None
 
 def show_image(image):
-    image = image.to("cpu")
-    reverse_transforms = transforms.Compose(
-        [
-            transforms.Lambda(lambda t: t * 255.0),
-            transforms.Lambda(lambda t: t.permute(1, 2, 0)),  # CHW to HWC
-            transforms.Lambda(lambda t: t.numpy().astype(np.uint8)),
-            transforms.ToPILImage(mode="L"),
-        ]
-    )
-    plt.imshow(reverse_transforms(image), cmap="gray")
-    plt.show()
+    pass
 
 
 

@@ -1,81 +1,70 @@
-import math
 import torch
-from torch import nn
-import torch.nn.functional as F
+import torch.nn as nn
+from math import sin, cos
 
-class UNet(nn.Module):
-    def __init__(self):
+
+class ReviewClassifier(nn.Module):
+    def __init__(self, embedding_dim, max_length, dataloader, vocab=None):
         super().__init__()
-        self.up_cha = (256, 128, 64)
-        self.down_cha = (64, 128, 256)
-        self.conv0 = nn.Conv2d(1, self.down_cha[0], kernel_size=3, stride=1, padding=1)
-        self.convtranspose0 = nn.Conv2d(self.down_cha[0], 1, kernel_size=3, stride=1, padding=1)
-        self.downs = nn.ModuleList(Block(self.down_cha[i], self.down_cha[i + 1], up=False) for i in range(len(self.down_cha) - 1))
-        self.ups = nn.ModuleList(Block(self.up_cha[i], self.up_cha[i + 1], up=True) for i in range(len(self.up_cha) - 1))
-        self.relu = nn.ReLU(inplace=True)
-        self.bnorm1 = nn.BatchNorm2d(self.up_cha[0])
-        self.convv1 = nn.Conv2d(self.up_cha[0], self.up_cha[0], kernel_size=3, stride=1, padding=1)
-        self.convv2 = nn.Conv2d(self.up_cha[0], self.up_cha[0], kernel_size=3, stride=1, padding=1)
-
-    def forward(self, x): ## no residual
-        x = self.conv0(x)
-        residual = []
-        for i in self.downs:
-            x = i(x)
-            residual.append(x)
-        x = self.relu(self.convv1(x))
-        x = self.convv2(x)
-        for i in self.ups:
-            x = torch.cat((residual.pop(), x), dim=1)
-            x = i(x)
-        return self.convtranspose0(x)
+        layer = nn.TransformerEncoderLayer(
+            d_model=embedding_dim,
+            nhead=8,
+            batch_first=True
+            ,dim_feedforward=2048,
+        )
+        self.linear = nn.Linear(embedding_dim, 1)
+        self.embedding_dim = embedding_dim
+        self.max_length = max_length
+        self.layer_norm = nn.LayerNorm(embedding_dim)
+        self.encoder = nn.TransformerEncoder(layer, num_layers=6, enable_nested_tensor=False)
+        self.classifier = nn.Linear(embedding_dim, 2)
+        self.vocab = {"<pad>": 0, "<unk>": 1, "<mask>":2} if vocab is None else vocab
+        for data in dataloader:
+            for text in data["text"]:
+                for word in text.lower().split():
+                    if word not in self.vocab:
+                        self.vocab[word] = len(self.vocab)
+        self.embedding = nn.Embedding(num_embeddings=len(self.vocab), embedding_dim=self.embedding_dim, padding_idx=self.vocab["<pad>"])
 
 
+    def sinusoidalPositionEmbedding(self, x):
+        y = torch.zeros([1, self.max_length, self.embedding_dim], device=x.device)
+        for i in range(self.max_length):
+            y[0][i] = self.sinusoidal(i)
+        return x+y
 
+    def sinusoidal(self, pos):
+        v = [[sin(pos / (10000 ** (2 * i / self.embedding_dim))) for i in range(self.embedding_dim//2)],
+             [cos(pos / (10000 ** ((2 * i) / self.embedding_dim))) for i in range(self.embedding_dim//2)]]
+        v = torch.tensor(v, dtype=torch.float32)
+        return v.transpose(0, 1).reshape(-1)
 
-class Block(nn.Module):
-    def __init__(self, in_cha, out_cha, up):
-        super().__init__()
-        self.relu = nn.ReLU(inplace=True)
-        self.bnorm1 = nn.BatchNorm2d(out_cha)
-        self.bnorm2 = nn.BatchNorm2d(out_cha)
-        ch = 2 if up else 1
-        self.q_proj = nn.Conv2d(ch*in_cha, ch*in_cha, kernel_size=1, stride=1, padding=0)
-        self.k_proj = nn.Conv2d(ch*in_cha, ch*in_cha, kernel_size=1, stride=1, padding=0)
-        self.v_proj = nn.Conv2d(ch*in_cha, ch*in_cha, kernel_size=1, stride=1, padding=0)
-        self.proj = nn.Conv2d(ch*in_cha, ch*in_cha, kernel_size=1, stride=1, padding=0)
-        for module in [self.q_proj, self.k_proj, self.v_proj, self.proj]:
-            nn.init.xavier_uniform_(module.weight)
-            nn.init.zeros_(module.bias)
-        nn.init.xavier_uniform_(self.proj.weight, gain=1e-5)
-        if up:
-            self.conv1 = nn.Conv2d(in_cha*2, out_cha, kernel_size=3, stride=1, padding=1)
-            self.transform = nn.ConvTranspose2d(out_cha, out_cha, kernel_size=3, stride=2, padding=1, output_padding=1)
-            self.group_norm = nn.GroupNorm(2*in_cha, 2*in_cha)
+    def forward(self, batch, task=0):
+        if task == 0:
+            # padding_mask: [B, L]，True 表示补齐位置
+            batch = [[self.vocab.get(word, self.vocab["<unk>"]) for word in text] for text in batch]
+            batch = torch.tensor(batch, dtype=torch.long, device=self.embedding.weight.device)
+            padding_mask = batch.eq(0)
+            encoded = self.encoder(
+                self.sinusoidalPositionEmbedding(self.embedding(batch)),
+                src_key_padding_mask=padding_mask
+            )
+
+            # 只对真实词的位置取平均，排除补齐位置
+            valid = (~padding_mask).unsqueeze(-1).to(encoded.dtype)
+            pooled = (encoded * valid).sum(dim=1)
+            pooled = pooled / valid.sum(dim=1).clamp(min=1)
+            return self.classifier(pooled)
         else:
-            self.conv1 = nn.Conv2d(in_cha, out_cha, kernel_size=3, stride=1, padding=1)
-            self.transform = nn.Conv2d(out_cha, out_cha, kernel_size=3, stride=2, padding=1)
-            self.group_norm = nn.GroupNorm(in_cha, in_cha)
+            # padding_mask: [B, L]，True 表示补齐位置
+            batch = [[self.vocab.get(word, self.vocab["<unk>"]) for word in text] for text in batch]
+            batch = torch.tensor(batch, dtype=torch.long, device=self.embedding.weight.device)
+            valid = batch.ne(self.vocab["<pad>"])
+            predict_mask = (torch.rand(batch.shape, device=batch.device) < 0.15) & valid
 
-    def forward(self, x):
-        B, C, H, W = x.shape
-        h = self.group_norm(x)
-        q = self.q_proj(h)
-        k = self.k_proj(h)
-        v = self.v_proj(h)
+            encoded = self.encoder(
+                self.sinusoidalPositionEmbedding(self.embedding(batch)),
+                src_key_padding_mask=predict_mask
+            )
+            return self.linear()
 
-        q = q.permute(0, 2, 3, 1).reshape(B, H * W, C)  # [B,HW,C]
-        k = k.reshape(B, C, H * W)  # [B,C,HW]
-        w = torch.bmm(q, k) * (int(C) ** (-0.5)) #[B,HW,HW]
-        w.reshape(B, -1)
-        w = F.softmax(w, dim=-1)
-        w = w.reshape(B, H*W, H*W)
-
-        v = v.permute(0, 2, 3, 1).reshape(B, H * W, C)  # [B,HW,C]
-        h = torch.bmm(w, v)  # [B,HW,C]
-        h = h.view(B, H, W, C).permute(0, 3, 1, 2)  # [B,C,H,W]
-        h = self.proj(h)  # [B,C,H,W]
-        x = x+h
-        x = self.bnorm1(self.relu(self.conv1(x)))
-        x = self.bnorm2(self.relu(self.transform(x)))
-        return x

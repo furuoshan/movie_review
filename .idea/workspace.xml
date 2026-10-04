@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2b10ab0-f6be-4522-997e-4ad883293aa1" name="Changes" comment="" />
+    <list default="true" id="f2b10ab0-f6be-4522-997e-4ad883293aa1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/movie_review.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/movie_review.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/dataloader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/training_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unet.py" beforeDir="false" afterPath="$PROJECT_DIR$/unet.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="15" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -14,10 +35,69 @@
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1,
-  "fromUser": false
-}]]></component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0046142653827748" />
+      <entry key="MS500" value="1.4259718084629784" />
+      <entry key="S2" value="2.747987944932201" />
+      <entry key="S5" value="3.7345905991538015" />
+      <entry key="S10" value="4.273781162324668" />
+      <entry key="S30" value="4.811447842520863" />
+      <entry key="S60" value="5.557297728397712" />
+      <entry key="M2" value="7.144627860161533" />
+      <entry key="M5" value="10.895384051601644" />
+      <entry key="M10" value="17.774281121820955" />
+      <entry key="M15" value="26.02529252151496" />
+      <entry key="M30" value="56.60817982137945" />
+      <entry key="H1" value="120.29523312716647" />
+      <entry key="H2" value="247.12861608014506" />
+      <entry key="H4" value="499.8209838374299" />
+      <entry key="D1" value="1299.8375883923538" />
+      <entry key="W1" value="1655.516625076868" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="2.2172469458182603E-184" />
+      <entry key="S2" value="1.2202632058210871E-46" />
+      <entry key="S5" value="4.3110335880474744E-19" />
+      <entry key="S10" value="6.565846166372976E-10" />
+      <entry key="S30" value="8.691543359787218E-4" />
+      <entry key="S60" value="0.029481431988837167" />
+      <entry key="M2" value="0.1718129700827401" />
+      <entry key="M5" value="0.5320035856035585" />
+      <entry key="M10" value="0.9759514374653815" />
+      <entry key="M15" value="1.3259568216136515" />
+      <entry key="M30" value="2.023853220373894" />
+      <entry key="H1" value="2.978857452739269" />
+      <entry key="H2" value="5.750574435871845" />
+      <entry key="H4" value="13.80639440296119" />
+      <entry key="D1" value="41.45017225299866" />
+      <entry key="W1" value="51.92306638626496" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.9637211991321792" />
+      <entry key="MS500" value="1.4146291554064252" />
+      <entry key="S2" value="2.742509760453548" />
+      <entry key="S5" value="3.73155505410258" />
+      <entry key="S10" value="4.272026162696068" />
+      <entry key="S30" value="4.8116358022095405" />
+      <entry key="S60" value="5.586031987138673" />
+      <entry key="M2" value="7.314506537567081" />
+      <entry key="M5" value="11.423243167163559" />
+      <entry key="M10" value="18.744786522964134" />
+      <entry key="M15" value="27.34562180748382" />
+      <entry key="M30" value="58.626058586266176" />
+      <entry key="H1" value="123.26544827650955" />
+      <entry key="H2" value="252.86766108202139" />
+      <entry key="H4" value="513.6149115361272" />
+      <entry key="D1" value="1341.2824572432394" />
+      <entry key="W1" value="1707.4387439559478" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3K53eLhZgknNq09yoT2eau5WsJE" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -28,12 +108,26 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "master",
-    "python.packages.toolwindow.project.migrated.to.right.top.v2": "true"
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/movie_review",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "python.packages.toolwindow.project.migrated.to.right.top.v2": "true",
+    "settings.editor.selected.configurable": "com.intellij.mcpserver.settings"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\movie_review" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -48,7 +142,10 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1790833695881</updated>
-      <workItem from="1790833696943" duration="1000" />
+      <workItem from="1790833696943" duration="21485000" />
+      <workItem from="1790989418865" duration="4054000" />
+      <workItem from="1790993519877" duration="16447000" />
+      <workItem from="1791077318252" duration="5841000" />
     </task>
     <servers />
   </component>
